@@ -33,13 +33,22 @@ namespace Calendar
             return 0;
         }
 
-        void Start()
+        void Awake()
         {
             days = GetComponentsInChildren<Day>();
-            for(int i = 0; i < days.Length; i++)
+            for (int i = 0; i < days.Length; i++)
             {
                 days[i].dayOfWeek = intToDayOfWeek[i];
                 days[i].text.text = "";
+            }
+        }
+
+        void CacheDays()
+        {
+            days = GetComponentsInChildren<Day>();
+            for (int i = 0; i < days.Length; i++)
+            {
+                days[i].dayOfWeek = intToDayOfWeek[i];
             }
         }
 
@@ -53,6 +62,8 @@ namespace Calendar
                     return;
                 }
             }
+            CacheDays();
+            SetDay(dayOfWeek, num);
         }
 
         public Day GetDay(DayOfWeek dayOfWeek)
@@ -64,7 +75,8 @@ namespace Calendar
                     return day;
                 }
             }
-            return null;
+            CacheDays();
+            return GetDay(dayOfWeek);
         }
     }
 }

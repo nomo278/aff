@@ -16,7 +16,7 @@ namespace Calendar
 
             // First day of this month
             DateTime first = new DateTime(now.Year, now.Month, 1);
-            first = first.AddMonths(-1);
+            // first = first.AddMonths(-1);
 
             // Last day of previous month
             DateTime last = first.AddMonths(-1);
@@ -69,6 +69,7 @@ namespace Calendar
                     } */
                 }
 
+                Debug.Log(weeks[currWeek]);
 
                 if (i == now.Day)
                 {

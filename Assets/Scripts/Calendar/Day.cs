@@ -15,6 +15,7 @@ namespace Calendar
             {
                 if(_text == null)
                 {
+                    Debug.Log("yep null");
                     _text = GetComponent<Text>();
                 }
                 return _text;

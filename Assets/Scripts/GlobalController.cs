@@ -58,7 +58,6 @@ public class GlobalController : MonoBehaviour {
                 }
             }
         }
-
         currentMenu = animPlayer;
     }
 
