@@ -38,9 +38,18 @@ public class GlobalController : MonoBehaviour {
 
     public AnimationPlayer previousMenu;
     public AnimationPlayer currentMenu;
+
+    Stack<AnimationPlayer> menuStack = new Stack<AnimationPlayer>();
+
     public void SetCurrentMenu(AnimationPlayer animPlayer)
     {
-        if(initialMenu < 2)
+        if(animPlayer.gameObject.name != "NavBar")
+        {
+            // Debug.Log("pushing: " + animPlayer.name);
+            menuStack.Push(animPlayer);
+        }
+
+        if (initialMenu < 2)
         {
             if (animPlayer.gameObject.name == "MainScreen")
             {
@@ -54,7 +63,38 @@ public class GlobalController : MonoBehaviour {
                 }
             }
         }
-        currentMenu = animPlayer;
+    }
+
+    public void BackMenu()
+    {
+        /*
+        AnimationPlayer exitMenu = menuStack.Pop();
+        Debug.Log("popping: " + exitMenu.name);
+        // Debug.Log("exit menu: " + exitMenu);
+        AnimationPlayer nextMenu = menuStack.Peek();
+        Debug.Log("pushing: " + nextMenu.name);
+        // Debug.Log("next menu: " + nextMenu);
+        exitMenu.ExitAnimation(nextMenu);  */
+        if(menuStack.Count > 1)
+            menuStack.Pop().ExitAnimation(menuStack.Pop());
+    }
+
+    public void BackMenuNoEnter()
+    {
+        // Debug.Log("popping: " + menuStack.Peek().name);
+        if(menuStack.Count > 0)
+            menuStack.Pop().ExitAnimation();
+    }
+
+    public void GoToMenu(AnimationPlayer animationPlayer)
+    {
+        if(menuStack.Count > 0)
+            menuStack.Peek().ExitAnimation(animationPlayer);
+    }
+
+    public void GoToMenuNoExit(AnimationPlayer animationPlayer)
+    {
+        animationPlayer.EnterAnimation();
     }
 
     public void GoToHomeScreen()

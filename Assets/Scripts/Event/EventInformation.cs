@@ -20,7 +20,6 @@ namespace Events
         public void SetEventInformation(JSONNode rootNode)
         {
             AnimationPlayer animPlayer = GetComponent<AnimationPlayer>();
-            animPlayer.EnterAnimation();
 
             Debug.Log("show information for film: " + rootNode["Film"]);
 
@@ -64,6 +63,28 @@ namespace Events
                     eventInfoEntry.info.text = info;
                     eventInfoEntry.label.text = label;
                     eventInfoEntriesParent.offsetMin = new Vector2(0f, eventInfoEntriesParent.offsetMin.y - height);
+
+                    Button button = go.GetComponent<Button>();
+                    switch(keys[i])
+                    {
+                        case "RT":
+                            eventInfoEntry.label.text = "Runtime";
+                            break;
+                        case "Trailer":
+                            button.onClick.AddListener(() => Application.OpenURL(info));
+                            break;
+                        case "ATLFF Webpage":
+                            button.onClick.AddListener(() => Application.OpenURL(info));
+                            break;
+                        case "Website":
+                            button.onClick.AddListener(() => Application.OpenURL(info));
+                            break;
+                        case "Twitter":
+                            string twitter_url = "http://www.twitter.com/" + info.Trim('@');
+                            button.onClick.AddListener(() => Application.OpenURL(info));
+                            break;
+                    }
+
                 }
 
                 if(i == keys.Length-1)
@@ -80,14 +101,12 @@ namespace Events
                     EventInfoEntry eventInfoEntry = go.GetComponent<EventInfoEntry>();
                     eventInfoEntry.info.text = "Back";
                     eventInfoEntry.label.gameObject.SetActive(false);
-                    go.GetComponent<Button>().onClick.AddListener(() => animPlayer.ExitAnimation());
+                    go.GetComponent<Button>().onClick.AddListener(() => GlobalController.instance.BackMenuNoEnter());
                     eventInfoEntriesParent.offsetMin = new Vector2(0f, eventInfoEntriesParent.offsetMin.y - height);
                 }
             }
-            /*
-            RectTransform temp = eventInfoEntriesParent.parent.GetComponent<RectTransform>();
-            temp.offsetMin = new Vector2(temp.offsetMin.x, 0f);
-            temp.offsetMax = new Vector2(temp.offsetMax.x, 0f);*/
+
+            GlobalController.instance.GoToMenuNoExit(animPlayer);
         }
     }
 }
