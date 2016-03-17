@@ -8,24 +8,8 @@ namespace Calendar
     {
         public int day;
         public DayOfWeek dayOfWeek;
-        public Text _text;
-        public Text text
-        {
-            get
-            {
-                if(_text == null)
-                {
-                    Debug.Log("yep null");
-                    _text = GetComponent<Text>();
-                }
-                return _text;
-            }
-        }
-        void Awake()
-        {
-            day = 1;
-            _text = GetComponentInChildren<Text>();
-        }
+        public Text text;
+        public Image highlight;
     }
 }
 

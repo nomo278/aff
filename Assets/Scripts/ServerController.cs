@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -39,13 +41,16 @@ public class ServerController : MonoBehaviour
         StartCoroutine(GetFilmList(post));
     }
 
+    JSONNode rootNode;
+
     IEnumerator GetFilmList(WWW post)
     {
         yield return post;
-        CacheFilmList(JSON.Parse(post.text));
+        rootNode = JSON.Parse(post.text);
+        CacheFilmList(rootNode);
     }
 
-    public List<JSONNode> filmList = new List<JSONNode>();
+    public Dictionary<string, JSONNode> filmList = new Dictionary<string, JSONNode>();
     void CacheFilmList(JSONNode rootNode)
     {
         if (filmList.Count > 0)
@@ -53,8 +58,30 @@ public class ServerController : MonoBehaviour
 
         foreach (JSONNode jn in rootNode.AsArray)
         {
-            filmList.Add(jn);
+            filmList.Add(jn["Film"],jn);
         }
+        CacheDates();
+    }
 
+    public Dictionary<string, DateTime> filmDates = new Dictionary<string, DateTime>();
+    public void CacheDates()
+    {
+        foreach(KeyValuePair<string,JSONNode> kvp in filmList)
+        {
+            string dateRaw = kvp.Value["Screening Day"];
+
+            if(dateRaw != null)
+            {
+                if(dateRaw.Length > 0)
+                {
+                    string dateString = dateRaw.Split('(', ')')[1];
+                    string parseDateString = dateString += "/" + Calendar.Calendar.now.Year;
+                    DateTime dt = Convert.ToDateTime(parseDateString);
+                    filmDates.Add(kvp.Key, dt);
+                    return;
+                }
+            }
+            filmDates.Add(kvp.Key, DateTime.MinValue);
+        }
     }
 }

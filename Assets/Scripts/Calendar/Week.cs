@@ -35,13 +35,18 @@ namespace Calendar
 
         void Awake()
         {
+            
             days = GetComponentsInChildren<Day>();
             for (int i = 0; i < days.Length; i++)
             {
-                days[i].dayOfWeek = intToDayOfWeek[i];
                 days[i].text.text = "";
             }
-        }
+
+            for (int i = 0; i < days.Length; i++)
+            {
+                days[i].highlight.gameObject.SetActive(false);
+            }
+        } 
 
         void CacheDays()
         {
@@ -68,6 +73,7 @@ namespace Calendar
 
         public Day GetDay(DayOfWeek dayOfWeek)
         {
+            // Debug.Log(dayOfWeek);
             foreach (Day day in days)
             {
                 if (day.dayOfWeek == dayOfWeek)
