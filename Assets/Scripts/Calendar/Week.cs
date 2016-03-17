@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using System;
 using System.Collections.Generic;
 
-namespace Calendar
+namespace Calendars
 {
     public class Week : MonoBehaviour
     {
@@ -36,7 +36,7 @@ namespace Calendar
         void Awake()
         {
             
-            days = GetComponentsInChildren<Day>();
+            // days = GetComponentsInChildren<Day>();
             for (int i = 0; i < days.Length; i++)
             {
                 days[i].text.text = "";
@@ -63,6 +63,7 @@ namespace Calendar
             {
                 if(day.dayOfWeek == dayOfWeek)
                 {
+                    day.day = num;
                     day.text.text = num.ToString();
                     return;
                 }

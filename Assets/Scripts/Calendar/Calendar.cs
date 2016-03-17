@@ -3,37 +3,36 @@ using UnityEngine.UI;
 using System;
 using System.Collections.Generic;
 
-namespace Calendar
+using Events;
+
+namespace Calendars
 {
     public class Calendar : MonoBehaviour
     {
         public Font currentMonthNormal, currentMonthBold, otherMonth;
-        Week[] weeks;
+        public Week[] weeks;
         public static DateTime now;
 
-        DateTime currentMonth;
+        public DateTime currentMonth;
 
         public NavigationBar navBar;
 
-        // Use this for initialization
-        void Start()
+        public EventList eventList;
+        
+        void OnEnable()
         {
-            weeks = GetComponentsInChildren<Week>();
-
             now = DateTime.Now;
             currentMonth = new DateTime(now.Year, now.Month, 1);
-
-            SetupCalendarMonth(currentMonth);
+            // SetupCalendarMonth(currentMonth);
         }
 
-        void SetupCalendarMonth(DateTime month)
+        public void SetupCalendarMonth(DateTime month)
         {
             string month_name = month.ToString("MMMM yyyy");
             navBar.monthYear.text = month_name;
 
             // First day of this month
             DateTime first = new DateTime(month.Year, month.Month, 1);
-            // first = first.AddMonths(-1);
 
             // Last day of previous month
             DateTime last = first.AddMonths(-1);
@@ -67,24 +66,26 @@ namespace Calendar
 
                 if(currWeek < weeks.Length)
                 {
+                    Day day = weeks[currWeek].GetDay(dayOfWeek);
                     weeks[currWeek].SetDay(dayOfWeek, first.Day);
-                    weeks[currWeek].GetDay(dayOfWeek).text.font = currentMonthNormal;
-                    weeks[currWeek].GetDay(dayOfWeek).text.color = Color.white;
-                    weeks[currWeek].GetDay(dayOfWeek).highlight.gameObject.SetActive(false);
+                    day.day = first.Day;
+                    day.text.font = currentMonthNormal;
+                    day.text.color = Color.white;
+                    day.highlight.gameObject.SetActive(false);
 
                     if (i == now.Day)
                     {
                         if (month.Month == now.Month)
                         {
-                            Debug.Log("did this");
                             // Set font to bold for current day
                             weeks[currWeek].GetDay(dayOfWeek).text.font = currentMonthBold;
-                            weeks[currWeek].GetDay(dayOfWeek).highlight.gameObject.SetActive(true);
+                            // weeks[currWeek].GetDay(dayOfWeek).highlight.gameObject.SetActive(true);
                         }
                     }
                 }
 
                 first = first.AddDays(1);
+
 
                 // Process last week
                 if (i == lastDayOfMonth && currWeek < weeks.Length)
@@ -116,38 +117,52 @@ namespace Calendar
             DateTime first = new DateTime(now.Year, now.Month, 1);
             int firstDayOfMonth = first.Day;
             int lastDayOfMonth = DateTime.DaysInMonth(first.Year, first.Month);
+            GetDay(day).SetHighlighted(true);
+        }
 
-            if(day >= firstDayOfMonth && day <= lastDayOfMonth)
+        public Day GetDay(int date)
+        {
+            foreach(Week week in weeks)
             {
-                int currWeek = 0;
-                for (int i = 1; i < lastDayOfMonth + 1; i++)
+                foreach (Day day in week.days)
                 {
-                    DayOfWeek dayOfWeek = first.DayOfWeek;
-                    if(i == day)
+                    if (day.day == date)
                     {
-                        weeks[currWeek].GetDay(dayOfWeek).highlight.gameObject.SetActive(true);
-                        return;
-                    }
-                    first = first.AddDays(1);
-                    if (dayOfWeek == DayOfWeek.Saturday)
-                    {
-                        currWeek++;
+                        return day;
                     }
                 }
             }
-            Debug.Log("day didn't exist");
+            return null;
+        }
+
+        public void ClearDayHighlights()
+        {
+            foreach (Week week in weeks)
+            {
+                foreach (Day day in week.days)
+                {
+                    day.SetHighlighted(false);
+                }
+            }
         }
 
         public void PrevMonth()
         {
             currentMonth = currentMonth.AddMonths(-1);
             SetupCalendarMonth(currentMonth);
+            SetupEvents();
         }
 
         public void NextMonth()
         {
             currentMonth = currentMonth.AddMonths(1);
             SetupCalendarMonth(currentMonth);
+            SetupEvents();
+        }
+
+        public void SetupEvents()
+        {
+            eventList.PopulateCalendar(currentMonth, this);
         }
     }
 }

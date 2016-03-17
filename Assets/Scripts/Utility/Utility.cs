@@ -1,4 +1,6 @@
-﻿
+﻿using UnityEngine;
+using System.Collections.Generic;
+
 public static class Utility {
     public static string Md5Sum(string strToEncrypt)
     {
@@ -18,5 +20,29 @@ public static class Utility {
         }
 
         return hashString.PadLeft(32, '0');
+    }
+
+    public static void DeleteGameObjects(this List<GameObject> gameObjects)
+    {
+        if (gameObjects.Count > 0)
+        {
+            for (int i = 0; i < gameObjects.Count; i++)
+            {
+                Object.Destroy(gameObjects[i]);
+            }
+            gameObjects.Clear();
+        }
+    }
+
+    public static void PositionEntry(this RectTransform rt, int position, float height)
+    {
+        rt.anchoredPosition = new Vector2(0f, -position * height);
+    }
+
+    public static void FixOffsets(this RectTransform rt)
+    {
+        rt.offsetMin = new Vector2(0f, rt.offsetMin.y);
+        rt.offsetMax = new Vector2(1f, rt.offsetMax.y);
+        rt.localScale = Vector3.one;
     }
 }

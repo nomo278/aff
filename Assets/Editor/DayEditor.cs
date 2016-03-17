@@ -3,7 +3,7 @@ using UnityEngine.UI;
 using UnityEditor;
 using System.Collections;
 
-namespace Calendar
+namespace Calendars
 {
     [CustomEditor(typeof(Day))]
     [CanEditMultipleObjects]
@@ -44,6 +44,34 @@ namespace Calendar
                         Vector2 original = day.highlight.GetComponent<RectTransform>().anchoredPosition;
                         day.highlight.GetComponent<RectTransform>().anchoredPosition = Vector2.zero;
                         day.highlight.GetComponent<RectTransform>().anchoredPosition = original;
+                    }
+                }
+            }
+
+        }
+    }
+
+    [CustomEditor(typeof(Week))]
+    [CanEditMultipleObjects]
+    public class WeekEditor : Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            base.OnInspectorGUI();
+            if (GUILayout.Button("Setup Properties"))
+            {
+                if (target != null)
+                {
+                    Week week = (Week)target;
+                    week.days = week.gameObject.GetComponentsInChildren<Day>();
+                }
+
+                if (targets.Length > 0)
+                {
+                    foreach (Object obj in targets)
+                    {
+                        Week week = (Week)obj;
+                        week.days = week.gameObject.GetComponentsInChildren<Day>();
                     }
                 }
             }

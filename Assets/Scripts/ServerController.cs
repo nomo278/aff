@@ -6,6 +6,8 @@ using System.Collections.Generic;
 
 using SimpleJSON;
 
+using Calendars;
+
 public class ServerController : MonoBehaviour
 {
     private static ServerController _instance;
@@ -27,6 +29,8 @@ public class ServerController : MonoBehaviour
     }
     public const string secretKey = "secretKey";
     public const string filmListUrl = "http://www.surconsultinggroup.com/aff/getfilms.php";
+
+    public Calendar calendar;
 
     void Start()
     {
@@ -69,19 +73,23 @@ public class ServerController : MonoBehaviour
         foreach(KeyValuePair<string,JSONNode> kvp in filmList)
         {
             string dateRaw = kvp.Value["Screening Day"];
-
+            bool found = false;
             if(dateRaw != null)
             {
                 if(dateRaw.Length > 0)
                 {
-                    string dateString = dateRaw.Split('(', ')')[1];
-                    string parseDateString = dateString += "/" + Calendar.Calendar.now.Year;
-                    DateTime dt = Convert.ToDateTime(parseDateString);
-                    filmDates.Add(kvp.Key, dt);
-                    return;
+                    if(dateRaw.Contains("(") && dateRaw.Contains(")"))
+                    {
+                        string dateString = dateRaw.Split('(', ')')[1];
+                        string parseDateString = dateString += "/" + Calendars.Calendar.now.Year;
+                        DateTime dt = Convert.ToDateTime(parseDateString);
+                        filmDates.Add(kvp.Key, dt);
+                        found = true;
+                    }
                 }
             }
-            filmDates.Add(kvp.Key, DateTime.MinValue);
+            if(!found)
+                filmDates.Add(kvp.Key, DateTime.MinValue);
         }
     }
 }

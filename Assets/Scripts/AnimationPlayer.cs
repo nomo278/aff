@@ -13,6 +13,12 @@ public class AnimationPlayer : MonoBehaviour {
 
     Animator animator;
 
+    // Register animation players that were disabled
+    void OnEnable()
+    {
+        GlobalController.instance.animPlayers.Add(this);
+    }
+
 	// Use this for initialization
 	void Start () {
         animator = GetComponent<Animator>();

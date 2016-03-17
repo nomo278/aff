@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System.Collections.Generic;
 
 public class GlobalController : MonoBehaviour {
 
@@ -22,17 +22,12 @@ public class GlobalController : MonoBehaviour {
     }
 
     public AnimationPlayer startAnimPlayer;
-    AnimationPlayer[] animPlayers;
+    public List<AnimationPlayer> animPlayers = new List<AnimationPlayer>();
     public bool debugMode = false;
 	// Use this for initialization
 	void Awake() {
-        animPlayers = FindObjectsOfType<AnimationPlayer>();
         if (debugMode)
             return;
-        foreach(AnimationPlayer ap in animPlayers)
-        {
-            ap.gameObject.SetActive(false);
-        }
         startAnimPlayer.EnterAnimation();
 	}
 
@@ -41,6 +36,7 @@ public class GlobalController : MonoBehaviour {
 
     int initialMenu = 0;
 
+    public AnimationPlayer previousMenu;
     public AnimationPlayer currentMenu;
     public void SetCurrentMenu(AnimationPlayer animPlayer)
     {
@@ -63,7 +59,20 @@ public class GlobalController : MonoBehaviour {
 
     public void GoToHomeScreen()
     {
-        currentMenu.ExitAnimation(mainScreen);
-        navBar.ExitAnimation();
+        for(int i = 0; i < animPlayers.Count; i++)
+        {
+            if(animPlayers[i].gameObject.activeInHierarchy)
+            {
+                if(animPlayers[i] != startAnimPlayer)
+                {
+                    if (i == animPlayers.Count - 1)
+                    {
+                        navBar.ExitAnimation();
+                    }
+                    animPlayers[i].ExitAnimation();
+                }
+            }
+        }
+        mainScreen.EnterAnimation();
     }
 }
