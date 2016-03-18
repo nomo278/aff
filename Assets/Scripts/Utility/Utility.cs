@@ -1,4 +1,6 @@
 ﻿using UnityEngine;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 
 public static class Utility {
@@ -28,7 +30,7 @@ public static class Utility {
         {
             for (int i = 0; i < gameObjects.Count; i++)
             {
-                Object.Destroy(gameObjects[i]);
+                UnityEngine.Object.Destroy(gameObjects[i]);
             }
             gameObjects.Clear();
         }
@@ -44,5 +46,14 @@ public static class Utility {
         rt.offsetMin = new Vector2(0f, rt.offsetMin.y);
         rt.offsetMax = new Vector2(1f, rt.offsetMax.y);
         rt.localScale = Vector3.one;
+    }
+
+    public static IEnumerator DelayedFunction(float waitTime, params Action[] actions)
+    {
+        yield return new WaitForSeconds(waitTime);
+        foreach (Action action in actions)
+        {
+            action();
+        }
     }
 }

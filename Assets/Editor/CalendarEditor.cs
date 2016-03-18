@@ -7,7 +7,7 @@ namespace Calendars
 {
     [CustomEditor(typeof(Day))]
     [CanEditMultipleObjects]
-    public class DayEditor : Editor
+    public class CalendarEditor : Editor
     {
         public override void OnInspectorGUI()
         {

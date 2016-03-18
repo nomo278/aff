@@ -21,6 +21,9 @@ public class GlobalController : MonoBehaviour {
         }
     }
 
+    public delegate void BackMenuClick();
+    public static event BackMenuClick OnBackMenuClick;
+
     public AnimationPlayer startAnimPlayer;
     public List<AnimationPlayer> animPlayers = new List<AnimationPlayer>();
     public bool debugMode = false;
@@ -75,7 +78,10 @@ public class GlobalController : MonoBehaviour {
         Debug.Log("pushing: " + nextMenu.name);
         // Debug.Log("next menu: " + nextMenu);
         exitMenu.ExitAnimation(nextMenu);  */
-        if(menuStack.Count > 1)
+        if (OnBackMenuClick != null)
+            OnBackMenuClick();
+
+        if (menuStack.Count > 1)
             menuStack.Pop().ExitAnimation(menuStack.Pop());
     }
 

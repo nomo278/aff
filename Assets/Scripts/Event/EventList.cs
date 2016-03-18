@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 
 using SimpleJSON;
@@ -30,8 +31,20 @@ namespace Events
         {
             EmptyEventList();
             Calendar calendar = FindObjectOfType<Calendar>();
-            calendar.SetupCalendarMonth(calendar.currentMonth);
-            PopulateCalendar(calendar.currentMonth, calendar);
+            StartCoroutine(Utility.DelayedFunction(0.1f, () => calendar.SetupCalendarMonth(calendar.currentMonth)));
+            StartCoroutine(Utility.DelayedFunction(0.2f, () => PopulateCalendar(calendar.currentMonth, calendar)));
+            GlobalController.OnBackMenuClick += OnBackMenuClick;
+        }
+
+        void OnDisable()
+        {
+            GlobalController.OnBackMenuClick -= OnBackMenuClick;
+        }
+
+        void OnBackMenuClick()
+        {
+            eventEntriesParent.offsetMin = offsetMin;
+            eventEntriesParent.offsetMax = offsetMax;
         }
 
         public void PopulateCalendar(DateTime dt, Calendar calendar)
@@ -69,22 +82,50 @@ namespace Events
             EmptyEventList();
         }
 
+        private static int CompareJSONNodeShowtimes(JSONNode x, JSONNode y)
+        {
+            string x_showtime = x["Time-Slot"];
+            string y_showtime = y["Time-Slot"];
+
+            if (x_showtime != null && y_showtime != null)
+            {
+                DateTime x_time = DateTime.MaxValue;
+                DateTime.TryParse(x_showtime, out x_time);
+                DateTime y_time = DateTime.MaxValue;
+                DateTime.TryParse(y_showtime, out y_time);
+                return DateTime.Compare(x_time, y_time);
+            }
+            return -1;
+        }
+
         public void PopulateEventList(int calendarPos)
         {
             eventEntries.DeleteGameObjects();
             eventEntriesParent.offsetMin = new Vector2(0f, 0f);
             Destroy(emptyEntry);
-            int i = 0;
-            foreach(string str in calendarToFilms[calendarPos])
+
+            List<string> films = calendarToFilms[calendarPos];
+
+            List<JSONNode> film_nodes = new List<JSONNode>();
+
+            foreach(string str in films)
             {
-                string film = filmList[str]["Film"];
+                if(filmList.ContainsKey(str))
+                    film_nodes.Add(filmList[str]);
+            }
+            film_nodes.Sort(CompareJSONNodeShowtimes);
+
+            int i = 0;
+            foreach(JSONNode node in film_nodes)
+            {
+                string film = node["Film"];
 
                 eventEntries.Add((GameObject)Instantiate(eventEntryPrefab, Vector3.zero, Quaternion.identity));
                 GameObject go = eventEntries[eventEntries.Count - 1];
                 go.transform.parent = eventEntriesParent;
 
-                JSONNode rootNode = filmList[str];
-                go.GetComponent<Button>().onClick.AddListener(() => eventInformation.SetEventInformation(rootNode));
+                // JSONNode rootNode = filmList[str];
+                go.GetComponent<Button>().onClick.AddListener(() => eventInformation.SetEventInformation(node));
 
                 RectTransform rt = go.GetComponent<RectTransform>();
 
@@ -93,15 +134,23 @@ namespace Events
                 rt.FixOffsets();
 
                 EventEntry eventEntry = go.GetComponent<EventEntry>();
-                eventEntry.filmName.text = filmList[str]["Film"];
-                eventEntry.directors.text = filmList[str]["Director(s)"];
-                eventEntry.venue.text = filmList[str]["Venue"];
-                eventEntry.timeSlot.text = filmList[str]["Time-Slot"];
+                eventEntry.filmName.text = node["Film"];
+                eventEntry.directors.text = node["Director(s)"];
+                eventEntry.venue.text = node["Venue"];
+                eventEntry.timeSlot.text = node["Time-Slot"];
 
                 eventEntriesParent.offsetMin = new Vector2(0f, eventEntriesParent.offsetMin.y - height);
 
                 i++;
             }
+            CacheOffset();
+        }
+
+        Vector2 offsetMin, offsetMax;
+        void CacheOffset()
+        {
+            offsetMin = eventEntriesParent.offsetMin;
+            offsetMax = eventEntriesParent.offsetMax;
         }
 
         public void EmptyEventList()

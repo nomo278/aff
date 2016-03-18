@@ -15,9 +15,12 @@ namespace Film
         public GameObject filmListEntryPrefab;
 
         public EventInformation eventInformation;
+        public FilmFilter filmFilter;
 
         List<GameObject> filmEntries = new List<GameObject>();
         Dictionary<string,JSONNode> filmList = new Dictionary<string, JSONNode>();
+
+        public Dictionary<string, List<JSONNode>> blockToFilms = new Dictionary<string, List<JSONNode>>();
 
         void OnEnable()
         {
@@ -25,7 +28,21 @@ namespace Film
             {
                 PopulateFilmList();
             }
+            GlobalController.OnBackMenuClick += OnBackMenuClick;
         }
+
+        void OnDisable()
+        {
+            GlobalController.OnBackMenuClick -= OnBackMenuClick;
+        }
+
+        void OnBackMenuClick()
+        {
+            filmListEntriesParent.offsetMin = offsetMin;
+            filmListEntriesParent.offsetMax = offsetMax;
+        }
+
+        Dictionary<JSONNode, int> originalPositions = new Dictionary<JSONNode, int>();
 
         void PopulateFilmList()
         {
@@ -34,15 +51,17 @@ namespace Film
             filmEntries.DeleteGameObjects();
 
             int j = 0;
-            foreach(KeyValuePair<string,JSONNode> kvp in filmList)
+            foreach (KeyValuePair<string, JSONNode> kvp in filmList)
             {
+                originalPositions.Add(kvp.Value, j);
+
                 filmEntries.Add((GameObject)Instantiate(filmListEntryPrefab, Vector3.zero, Quaternion.identity));
                 GameObject go = filmEntries[filmEntries.Count - 1];
                 go.transform.parent = filmListEntriesParent;
                 RectTransform rt = go.GetComponent<RectTransform>();
 
                 float height = rt.rect.height;
-                rt.PositionEntry(j,height);
+                rt.PositionEntry(j, height);
                 rt.FixOffsets();
 
                 JSONNode jn = kvp.Value;
@@ -55,8 +74,35 @@ namespace Film
 
                 filmListEntriesParent.offsetMin = new Vector2(0f, filmListEntriesParent.offsetMin.y - height);
                 j++;
+
+                // Add films to blocks for filtering
+                string block_raw = jn["Block(s)"];
+                if (block_raw != null) { 
+                    if (block_raw.Length > 0)
+                    {
+                        string[] blocks = block_raw.Split(',');
+                        foreach (string block in blocks)
+                        {
+                            if (!blockToFilms.ContainsKey(block))
+                            {
+                                blockToFilms.Add(block, new List<JSONNode>());
+                            }
+                            blockToFilms[block].Add(jn);
+                        }
+                    }
+                }
             }
+
+            CacheOffset();
             UpdateEntries();
+            filmFilter.SetupFilters(blockToFilms);
+        }
+
+        Vector2 offsetMin, offsetMax;
+        void CacheOffset()
+        {
+            offsetMin = filmListEntriesParent.offsetMin;
+            offsetMax = filmListEntriesParent.offsetMax;
         }
 
         public void UpdateEntries()
