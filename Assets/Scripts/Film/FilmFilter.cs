@@ -42,16 +42,45 @@ namespace Film
                 filterSelections[i].gameObject.SetActive(true);
                 filterSelections[i].text.text = kvp.Key;
                 string key = kvp.Key;
-                bool isOn = filterSelections[i].toggle.isOn;
-                filterSelections[i].toggle.onValueChanged.AddListener(delegate { ValueChange(isOn, key); });
+                Toggle toggle = filterSelections[i].toggle;
+                filterSelections[i].toggle.onValueChanged.AddListener(delegate { ValueChange(toggle, key); });
                 i++;
             }
-            // ShowFilmFilter(true);
         }
-
-        public void ValueChange(bool isOn, string key)
+        List<string> activeKeys = new List<string>();
+        List<string> currentFilms = new List<string>();
+        public void ValueChange(Toggle toggle, string key)
         {
-            Debug.Log("key: " + key);
+            // Add to current list
+            if(toggle.isOn)
+            {
+                if (!activeKeys.Contains(key))
+                    activeKeys.Add(key);
+                // Debug.Log("Added key: " + key);
+            }
+            else
+            {
+                if (activeKeys.Contains(key))
+                    activeKeys.Remove(key);
+                // Debug.Log("Remove key: " + key);
+            }
+
+            currentFilms.Clear();
+            foreach(KeyValuePair<string, List<JSONNode>> kvp in blockToFilms)
+            {
+                if(activeKeys.Contains(kvp.Key))
+                {
+                    foreach(JSONNode node in kvp.Value)
+                    {
+                        string film = node["Film"];
+                        currentFilms.Add(film);
+                        // Debug.Log("Added: " + film);
+                    }
+                }
+            }
+
+            currentFilms.Sort();
+            filmList.SetFilmList(currentFilms);
         }
 
         bool isShowing = false;
