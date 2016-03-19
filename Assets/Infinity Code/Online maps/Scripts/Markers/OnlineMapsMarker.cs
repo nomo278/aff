@@ -51,6 +51,8 @@ public class OnlineMapsMarker : OnlineMapsMarkerBase
     private int _textureWidth;
     private int _width;
 
+    public string venue = "";
+
     /// <summary>
     /// Gets the marker colors.
     /// </summary>

@@ -88,8 +88,22 @@ public class ServerController : MonoBehaviour
                     }
                 }
             }
+            string venueRaw = kvp.Value["Venue"];
+            if(venueRaw != null)
+            {
+                if(venueRaw.Length > 0)
+                {
+                    string venue = venueRaw;
+                    if (!uniqueVenues.Contains(venue))
+                    {
+                        uniqueVenues.Add(venue);
+                    }
+                }
+            }
             if(!found)
                 filmDates.Add(kvp.Key, DateTime.MinValue);
         }
     }
+
+    public List<string> uniqueVenues = new List<string>();
 }

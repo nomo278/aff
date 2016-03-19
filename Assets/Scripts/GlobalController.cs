@@ -121,4 +121,9 @@ public class GlobalController : MonoBehaviour {
         }
         mainScreen.EnterAnimation();
     }
+
+    public void OpenUrl(string url)
+    {
+        Application.OpenURL(url);
+    }
 }

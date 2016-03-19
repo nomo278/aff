@@ -17,6 +17,9 @@ public class OnlineMapsGoogleAPIQuery
     /// </summary>
     public Action<string> OnComplete;
 
+    public string venue = "";
+    public Action<string, string> OnCompleteVenue;
+
     /// <summary>
     /// Event that occurs when the current request instance is disposed.
     /// </summary>
@@ -84,6 +87,7 @@ public class OnlineMapsGoogleAPIQuery
             _response = _status == OnlineMapsQueryStatus.success ? www.text : www.error;
 
             if (OnComplete != null) OnComplete(_response);
+            if (OnCompleteVenue != null) OnCompleteVenue(_response, venue);
             if (OnFinish != null) OnFinish(this);
             www.Dispose();
             www = null;

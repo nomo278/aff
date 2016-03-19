@@ -51,6 +51,7 @@ namespace Film
             filmList = ServerController.instance.filmList;
 
             int j = 0;
+            float height = 0f;
             foreach (KeyValuePair<string, JSONNode> kvp in filmList)
             {
                 string film = kvp.Key;
@@ -60,13 +61,13 @@ namespace Film
 
                 filmEntries.Add((GameObject)Instantiate(filmListEntryPrefab, Vector3.zero, Quaternion.identity));
                 GameObject go = filmEntries[filmEntries.Count - 1];
-                go.transform.parent = filmListEntriesParent;
+                go.transform.SetParent(filmListEntriesParent);
                 RectTransform rt = go.GetComponent<RectTransform>();
 
                 filmToGameObject.Add(film, rt);
                 currentFilms.Add(film);
 
-                float height = rt.rect.height;
+                height = rt.rect.height;
                 rt.PositionEntry(j, height);
                 rt.FixOffsets();
 
@@ -76,8 +77,6 @@ namespace Film
 
                 JSONNode rootNode = kvp.Value;
                 go.GetComponent<Button>().onClick.AddListener(() => eventInformation.SetEventInformation(rootNode));
-
-                filmListEntriesParent.offsetMin = new Vector2(0f, filmListEntriesParent.offsetMin.y - height);
                 j++;
 
                 // Add films to blocks for filtering
@@ -98,6 +97,8 @@ namespace Film
 
                 originalFilms = new List<string>(currentFilms);
             }
+
+            filmListEntriesParent.offsetMin = new Vector2(0f, filmListEntriesParent.offsetMin.y - (filmList.Count * height));
 
             CacheOffset();
             UpdateEntries();
@@ -123,15 +124,18 @@ namespace Film
 
 
             filmListEntriesParent.offsetMin = new Vector2(0f, Screen.height);
+            float height = 0f;
+
             // Enable and position correct gameobjects
             for (int i = 0; i < films.Count; i++)
             {
                 RectTransform rt = filmToGameObject[films[i]];
+                height = rt.rect.height;
                 rt.gameObject.SetActive(true);
-                float height = rt.rect.height;
                 rt.PositionEntry(i, height);
-                filmListEntriesParent.offsetMin = new Vector2(0f, filmListEntriesParent.offsetMin.y - height);
             }
+
+            filmListEntriesParent.offsetMin = new Vector2(0f, Screen.height - (films.Count * height));
 
             currentFilms = films;
         }

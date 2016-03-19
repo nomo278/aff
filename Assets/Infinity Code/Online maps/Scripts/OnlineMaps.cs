@@ -362,7 +362,11 @@ public class OnlineMaps : MonoBehaviour
     /// </summary>
     public static OnlineMaps instance
     {
-        get { return _instance; }
+        get {
+            if (_instance == null)
+                _instance = FindObjectOfType<OnlineMaps>();
+            return _instance;
+        }
     }
 
     /// <summary>

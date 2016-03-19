@@ -203,6 +203,37 @@ public class OnlineMapsControlBase : MonoBehaviour
         api.Redraw();
     }
 
+    public OnlineMapsMarker CreateMarker(Vector2 position, Texture2D texture)
+    {
+        OnlineMapsMarker m = new OnlineMapsMarker
+        {
+            position = position,
+            texture = texture
+        };
+        m.Init();
+        List<OnlineMapsMarker> markerList = api.markers.ToList();
+        markerList.Add(m);
+        api.markers = markerList.ToArray();
+        api.Redraw();
+        return m;
+    }
+
+    public void RemoveMarker(OnlineMapsMarker marker)
+    {
+        List<OnlineMapsMarker> markerList = api.markers.ToList();
+        markerList.Remove(marker);
+        api.markers = markerList.ToArray();
+        api.Redraw();
+    }
+
+    public void ClearMarkers()
+    {
+        List<OnlineMapsMarker> markerList = api.markers.ToList();
+        markerList.Clear();
+        api.markers = markerList.ToArray();
+        api.Redraw();
+    }
+
     /// <summary>
     /// Moves the marker to the location of the cursor.
     /// </summary>
