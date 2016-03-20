@@ -38,6 +38,8 @@ namespace Events
 
         void OnDisable()
         {
+            Destroy(emptyEntry);
+            eventEntries.DeleteGameObjects();
             GlobalController.OnBackMenuClick -= OnBackMenuClick;
         }
 
@@ -82,22 +84,6 @@ namespace Events
             EmptyEventList();
         }
 
-        private static int CompareJSONNodeShowtimes(JSONNode x, JSONNode y)
-        {
-            string x_showtime = x["Time-Slot"];
-            string y_showtime = y["Time-Slot"];
-
-            if (x_showtime != null && y_showtime != null)
-            {
-                DateTime x_time = DateTime.MaxValue;
-                DateTime.TryParse(x_showtime, out x_time);
-                DateTime y_time = DateTime.MaxValue;
-                DateTime.TryParse(y_showtime, out y_time);
-                return DateTime.Compare(x_time, y_time);
-            }
-            return -1;
-        }
-
         public void PopulateEventList(int calendarPos)
         {
             eventEntries.DeleteGameObjects();
@@ -113,7 +99,7 @@ namespace Events
                 if(filmList.ContainsKey(str))
                     film_nodes.Add(filmList[str]);
             }
-            film_nodes.Sort(CompareJSONNodeShowtimes);
+            film_nodes.Sort(Utility.CompareJSONNodeShowtimes);
 
             int i = 0;
             foreach(JSONNode node in film_nodes)

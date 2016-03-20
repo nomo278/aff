@@ -31,8 +31,12 @@ public class GlobalController : MonoBehaviour {
 	void Awake() {
         if (debugMode)
             return;
-        startAnimPlayer.EnterAnimation();
 	}
+
+    void Start()
+    {
+        mainScreen.EnterAnimation();
+    }
 
     public AnimationPlayer mainScreen;
     public AnimationPlayer navBar;
@@ -43,12 +47,11 @@ public class GlobalController : MonoBehaviour {
     public AnimationPlayer currentMenu;
 
     Stack<AnimationPlayer> menuStack = new Stack<AnimationPlayer>();
-
     public void SetCurrentMenu(AnimationPlayer animPlayer)
     {
         if(animPlayer.gameObject.name != "NavBar")
         {
-            // Debug.Log("pushing: " + animPlayer.name);
+            Debug.Log("pushing: " + animPlayer.name);
             menuStack.Push(animPlayer);
         }
 
@@ -82,18 +85,38 @@ public class GlobalController : MonoBehaviour {
             OnBackMenuClick();
 
         if (menuStack.Count > 1)
-            menuStack.Pop().ExitAnimation(menuStack.Pop());
+            if (menuStack.Peek().gameObject.name != "VenueList")
+            {
+                if(menuStack.Peek().gameObject.name == "EventInformation")
+                {
+                    menuStack.Pop().ExitAnimation();
+                }
+                else
+                {
+                    menuStack.Pop().ExitAnimation(menuStack.Peek());
+                    if (menuStack.Peek().gameObject.name == "FilmCategories")
+                        menuStack.Pop();
+                }
+            }
+            else
+            {
+                menuStack.Pop().ExitAnimationNoDisable();
+            }
     }
 
     public void BackMenuNoEnter()
     {
-        // Debug.Log("popping: " + menuStack.Peek().name);
+        Debug.Log("popping: " + menuStack.Peek().name);
         if(menuStack.Count > 0)
-            menuStack.Pop().ExitAnimation();
+        {
+            if(menuStack.Peek().gameObject.name != "VenueList")
+                menuStack.Pop().ExitAnimation();
+        }
     }
 
     public void GoToMenu(AnimationPlayer animationPlayer)
     {
+
         if(menuStack.Count > 0)
             menuStack.Peek().ExitAnimation(animationPlayer);
     }

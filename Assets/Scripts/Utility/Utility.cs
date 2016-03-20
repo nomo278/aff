@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
+
 using System;
 using System.Collections;
 using System.Collections.Generic;
+
+using SimpleJSON;
 
 public static class Utility {
     public static string Md5Sum(string strToEncrypt)
@@ -55,5 +58,21 @@ public static class Utility {
         {
             action();
         }
+    }
+
+    public static int CompareJSONNodeShowtimes(JSONNode x, JSONNode y)
+    {
+        string x_showtime = x["Time-Slot"];
+        string y_showtime = y["Time-Slot"];
+
+        if (x_showtime != null && y_showtime != null)
+        {
+            DateTime x_time = DateTime.MaxValue;
+            DateTime.TryParse(x_showtime, out x_time);
+            DateTime y_time = DateTime.MaxValue;
+            DateTime.TryParse(y_showtime, out y_time);
+            return DateTime.Compare(x_time, y_time);
+        }
+        return -1;
     }
 }

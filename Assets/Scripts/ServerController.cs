@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using SimpleJSON;
 
 using Calendars;
+using Maps;
 
 public class ServerController : MonoBehaviour
 {
@@ -64,21 +65,25 @@ public class ServerController : MonoBehaviour
         {
             filmList.Add(jn["Film"],jn);
         }
-        CacheDates();
+        CacheData();
     }
 
     public Dictionary<string, DateTime> filmDates = new Dictionary<string, DateTime>();
-    public void CacheDates()
+    public Dictionary<string, List<string>> venueToFilms = new Dictionary<string, List<string>>();
+
+    public Dictionary<string, List<string>> categoryToFilm = new Dictionary<string, List<string>>();
+
+    public void CacheData()
     {
-        foreach(KeyValuePair<string,JSONNode> kvp in filmList)
+        foreach (KeyValuePair<string, JSONNode> kvp in filmList)
         {
             string dateRaw = kvp.Value["Screening Day"];
             bool found = false;
-            if(dateRaw != null)
+            if (dateRaw != null)
             {
-                if(dateRaw.Length > 0)
+                if (dateRaw.Length > 0)
                 {
-                    if(dateRaw.Contains("(") && dateRaw.Contains(")"))
+                    if (dateRaw.Contains("(") && dateRaw.Contains(")"))
                     {
                         string dateString = dateRaw.Split('(', ')')[1];
                         string parseDateString = dateString += "/" + Calendars.Calendar.now.Year;
@@ -88,22 +93,44 @@ public class ServerController : MonoBehaviour
                     }
                 }
             }
+
             string venueRaw = kvp.Value["Venue"];
-            if(venueRaw != null)
+            if (venueRaw != null)
             {
-                if(venueRaw.Length > 0)
+                if (venueRaw.Length > 0)
                 {
-                    string venue = venueRaw;
-                    if (!uniqueVenues.Contains(venue))
+                    if (MapMarkerPlacer.inputVenueToVenue.ContainsKey(venueRaw))
                     {
-                        uniqueVenues.Add(venue);
+                        string venue = MapMarkerPlacer.inputVenueToVenue[venueRaw];
+                        if (!venueToFilms.ContainsKey(venue))
+                        {
+                            venueToFilms.Add(venue, new List<string>());
+                        }
+                        string filmRaw = kvp.Value["Film"];
+                        if (filmRaw != null)
+                        {
+                            if (filmRaw.Length > 0)
+                            {
+                                venueToFilms[venue].Add(filmRaw);
+                                string categoryRaw = kvp.Value["Category"];
+                                if (venueRaw != null)
+                                {
+                                    if (venueRaw.Length > 0)
+                                    {
+                                        if (!categoryToFilm.ContainsKey(categoryRaw))
+                                            categoryToFilm.Add(categoryRaw, new List<string>());
+                                        categoryToFilm[categoryRaw].Add(filmRaw);
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
-            if(!found)
+
+            if (!found)
                 filmDates.Add(kvp.Key, DateTime.MinValue);
         }
-    }
 
-    public List<string> uniqueVenues = new List<string>();
+    }
 }

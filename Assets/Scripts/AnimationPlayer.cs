@@ -53,6 +53,23 @@ public class AnimationPlayer : MonoBehaviour {
         );
     }
 
+    public void ExitAnimationNoDisable()
+    {
+        StopAllCoroutines();
+        if (!gameObject.activeInHierarchy)
+            gameObject.SetActive(true);
+        if (animator == null)
+            animator = GetComponent<Animator>();
+        int animHash = Animator.StringToHash(exitAnimation);
+        animator.Play(animHash);
+        StartCoroutine(WaitForAnimationExit(
+            animHash,
+            new Action[] { },
+            exitDelay
+            )
+        );
+    }
+
     public void ExitAnimation(AnimationPlayer animPlayer)
     {
         if (!gameObject.activeInHierarchy)

@@ -3,6 +3,7 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 
 using SimpleJSON;
+using Maps;
 
 namespace Events
 {
@@ -21,7 +22,7 @@ namespace Events
         {
             AnimationPlayer animPlayer = GetComponent<AnimationPlayer>();
 
-            Debug.Log("show information for film: " + rootNode["Film"]);
+            // Debug.Log("show information for film: " + rootNode["Film"]);
 
             eventInfoEntries.DeleteGameObjects();
 
@@ -79,9 +80,14 @@ namespace Events
                         case "Website":
                             button.onClick.AddListener(() => Application.OpenURL(info));
                             break;
+                        case "Venue":
+                            eventInfoEntry.info.text = MapMarkerPlacer.inputVenueToVenue[info];
+                            string address = "http://maps.google.com/maps?q=" + MapMarkerPlacer.venueAddresses[MapMarkerPlacer.inputVenueToVenue[info]];
+                            button.onClick.AddListener(() => Application.OpenURL(address));
+                            break;
                         case "Twitter":
                             string twitter_url = "http://www.twitter.com/" + info.Trim('@');
-                            button.onClick.AddListener(() => Application.OpenURL(info));
+                            button.onClick.AddListener(() => Application.OpenURL(twitter_url));
                             break;
                     }
 

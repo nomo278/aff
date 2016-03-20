@@ -31,7 +31,7 @@ namespace Maps
             { "Plaza Theatre", "1049 Ponce de Leon Ave NE, Atlanta, GA 30306" },
             { "Hill Theatre", "1943 Pleasant Hill Rd, Duluth, GA 30096"},
             { "Buckhead Theatre", "3110 Roswell Rd NE, Atlanta, GA 30305" },
-            { "Serenbe", "9110 Selborne Ln #210, Palmetto, GA 30268"}
+            { "Serenbe", "10950 Hutceson Ferry Rd, Chattachoochee Hills, GA 30268"}
         };
 
         public static Dictionary<string, string> inputVenueToVenue = new Dictionary<string, string>
@@ -48,6 +48,11 @@ namespace Maps
         Dictionary<string, OnlineMapsMarker> venueMarkers = new Dictionary<string, OnlineMapsMarker>();
 
         bool locationSet = false;
+
+        // Events
+        public delegate void VenueClick(OnlineMapsMarker marker);
+        public static event VenueClick OnVenueClick;
+
         void OnEnable()
         {
             control = GetComponent<OnlineMapsTextureControl>();
@@ -79,19 +84,18 @@ namespace Maps
             Vector2 position = OnlineMapsFindLocation.GetCoordinatesFromResult(result);
             OnlineMapsMarker marker = control.CreateMarker(position, mapIcon);
             marker.venue = venue;
-            marker.OnClick += OnClickVenue;
+            venueMarkers.Add(venue, marker);
+            marker.OnClick -= InitialVenueClick;
+            marker.OnClick += InitialVenueClick;
+        }
 
-            if(!locationSet)
-            {
-                // TODO Set location here for testing
+        // How to set map position
+        // OnlineMaps.instance.position = position;
 
-                locationSet = true;
-            }
-        } 
-
-        void OnClickVenue(OnlineMapsMarkerBase marker)
+        void InitialVenueClick(OnlineMapsMarkerBase marker)
         {
-            Debug.Log("clicked marker for venue: " + ((OnlineMapsMarker)marker).venue);
+            if (OnVenueClick != null)
+                OnVenueClick(((OnlineMapsMarker)marker));
         }
     }
 }

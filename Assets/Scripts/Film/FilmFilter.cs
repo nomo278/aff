@@ -13,6 +13,8 @@ namespace Film
         RectTransform rectTransform;
 
         public FilmList filmList;
+        public Button showFilters;
+
         public List<FilterSelection> filterSelections = new List<FilterSelection>();
 
         Dictionary<string, List<JSONNode>> blockToFilms;

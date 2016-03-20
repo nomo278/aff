@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -17,12 +19,16 @@ namespace Film
         public EventInformation eventInformation;
         public FilmFilter filmFilter;
 
+        public Text categoryText;
+
         List<GameObject> filmEntries = new List<GameObject>();
         Dictionary<string,JSONNode> filmList = new Dictionary<string, JSONNode>();
 
         Dictionary<string, RectTransform> filmToGameObject = new Dictionary<string, RectTransform>();
 
         public Dictionary<string, List<JSONNode>> blockToFilms = new Dictionary<string, List<JSONNode>>();
+
+        public Action OnEnableAfter;
 
         void OnEnable()
         {
@@ -31,11 +37,39 @@ namespace Film
                 PopulateFilmList();
             }
             GlobalController.OnBackMenuClick += OnBackMenuClick;
+            if (OnEnableAfter != null)
+                OnEnableAfter();
+        }
+
+        public void SetCategory(FilmCategory filmCategory)
+        {
+            switch(filmCategory)
+            {
+                case FilmCategory.NarrativeFeatures:
+                    filmFilter.showFilters.gameObject.SetActive(false);
+                    break;
+                case FilmCategory.AnniversaryScreenings:
+                    filmFilter.showFilters.gameObject.SetActive(false);
+                    break;
+                case FilmCategory.ShortBlocks:
+                    filmFilter.showFilters.gameObject.SetActive(true);
+                    break;
+                case FilmCategory.DocumentaryFeatures:
+                    filmFilter.showFilters.gameObject.SetActive(false);
+                    break;
+            }
+                
+        }
+
+        public void SetCategoryText(string text)
+        {
+            categoryText.text = text;
         }
 
         void OnDisable()
         {
             GlobalController.OnBackMenuClick -= OnBackMenuClick;
+            filmFilter.ShowFilmFilter(false);
         }
 
         void OnBackMenuClick()
@@ -152,21 +186,6 @@ namespace Film
             float y = filmListEntriesParent.offsetMax.y;
             int topBuffer = ((int)((y - 750f) / 250f));
             int botBuffer = topBuffer + 10;
-            /*
-            for(int i = 0; i < filmEntries.Count; i++)
-            {
-                if (i < topBuffer)
-                    if (filmEntries[i].activeInHierarchy)
-                        filmEntries[i].SetActive(false);
-                if (i > botBuffer)
-                    if (filmEntries[i].activeInHierarchy)
-                        filmEntries[i].SetActive(false);
-                if(i > topBuffer && i < botBuffer)
-                {
-                    if(!filmEntries[i].activeInHierarchy)
-                        filmEntries[i].SetActive(true);
-                }
-            } */
 
             for(int i = 0; i < currentFilms.Count; i++)
             {
