@@ -11,7 +11,7 @@ using UnityEngine;
 /// </summary>
 [Serializable]
 [AddComponentMenu("")]
-public class OnlineMapsControlBase3D: OnlineMapsControlBase
+public class OnlineMapsControlBase3D : OnlineMapsControlBase
 {
     /// <summary>
     /// The event, which occurs when controls the camera.
@@ -140,8 +140,8 @@ public class OnlineMapsControlBase3D: OnlineMapsControlBase
         List<OnlineMapsMarker3D> ms = markers3D.ToList();
         OnlineMapsMarker3D marker = new OnlineMapsMarker3D
         {
-            position = markerPosition, 
-            prefab = prefab, 
+            position = markerPosition,
+            prefab = prefab,
             control = this,
             scale = marker3DScale,
             allowDefaultMarkerEvents = allowDefaultMarkerEvents
@@ -260,7 +260,7 @@ public class OnlineMapsControlBase3D: OnlineMapsControlBase
             foreach (KeyValuePair<int, OnlineMapsMarkerBillboard> pair in markerBillboards)
                 DestroyImmediate(pair.Value.gameObject);
         }
-        
+
         markerBillboards = null;
         DestroyImmediate(markersGameObject);
         markersGameObject = null;
@@ -479,7 +479,7 @@ public class OnlineMapsControlBase3D: OnlineMapsControlBase
             element.Create("CameraSpeed", cameraSpeed);
         }
 
-        element.Create("Marker2DMode", (int) marker2DMode);
+        element.Create("Marker2DMode", (int)marker2DMode);
         element.Create("Marker2DSize", marker2DSize);
         element.Create("Marker3DScale", marker3DScale);
         element.Create("Camera", activeCamera);
@@ -502,13 +502,13 @@ public class OnlineMapsControlBase3D: OnlineMapsControlBase
         if (cameraRotation.x > 80) cameraRotation.x = 80f;
         else if (cameraRotation.x < 0) cameraRotation.x = 0;
 
-        float rx = 90 - cameraRotation.x;
+        float rx = 90 /* - cameraRotation.x*/;
         if (rx > 89.9) rx = 89.9f;
 
         double px = Math.Cos(rx * Mathf.Deg2Rad) * cameraDistance;
         double py = Math.Sin(rx * Mathf.Deg2Rad) * cameraDistance;
         double pz = Math.Cos(cameraRotation.y * Mathf.Deg2Rad) * px;
-        px = Math.Sin(cameraRotation.y * Mathf.Deg2Rad) * px;
+        px = Math.Sin(0/*cameraRotation.y * Mathf.Deg2Rad * .15*/) * px; //Rotation on the Y axis
 
         Vector3 targetPosition = transform.position;
         if (this is OnlineMapsTileSetControl)
@@ -520,7 +520,7 @@ public class OnlineMapsControlBase3D: OnlineMapsControlBase
             {
                 targetPosition = control.originalPosition;
             }
-            
+
             if (control.useElevation && control.elevationZoomRange.InRange(api.zoom))
             {
                 double tlx, tly, brx, bry;
@@ -530,7 +530,7 @@ public class OnlineMapsControlBase3D: OnlineMapsControlBase
                 float yScale = control.GetBestElevationYScale(tlx, tly, brx, bry);
                 offset.y = control.GetMaxElevationValue(yScale);
             }
-            
+
             targetPosition += transform.rotation * offset;
         }
 
@@ -598,7 +598,8 @@ public class OnlineMapsControlBase3D: OnlineMapsControlBase
             float mx = marker.position.x;
             if (!(((mx > tlx && mx < brx) || (mx + 360 > tlx && mx + 360 < brx) ||
                  (mx - 360 > tlx && mx - 360 < brx)) &&
-                marker.position.y < tly && marker.position.y > bry)) continue;
+                marker.position.y < tly && marker.position.y > bry))
+                continue;
 
             int markerHashCode = marker.GetHashCode();
             OnlineMapsMarkerBillboard markerBillboard = null;
@@ -620,9 +621,9 @@ public class OnlineMapsControlBase3D: OnlineMapsControlBase
             Vector2 p = OnlineMapsUtils.LatLongToTilef(marker.position, api.buffer.apiZoom);
 
             p.x = Mathf.Repeat(p.x - (float)px, maxX);
-            p.y -= (float) py;
+            p.y -= (float)py;
 
-            float x = -p.x / api.width * OnlineMapsUtils.tileSize *  size.x + positionOffset.x;
+            float x = -p.x / api.width * OnlineMapsUtils.tileSize * size.x + positionOffset.x;
             float z = p.y / api.height * OnlineMapsUtils.tileSize * size.z - positionOffset.z;
 
             float y = GetElevationValue(x, z, yScale, tlx, tly, brx, bry);
