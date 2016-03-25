@@ -502,13 +502,13 @@ public class OnlineMapsControlBase3D: OnlineMapsControlBase
         if (cameraRotation.x > 80) cameraRotation.x = 80f;
         else if (cameraRotation.x < 0) cameraRotation.x = 0;
 
-        float rx = 90 - cameraRotation.x;
+        float rx = 90 /* - cameraRotation.x*/;
         if (rx > 89.9) rx = 89.9f;
 
         double px = Math.Cos(rx * Mathf.Deg2Rad) * cameraDistance;
         double py = Math.Sin(rx * Mathf.Deg2Rad) * cameraDistance;
         double pz = Math.Cos(cameraRotation.y * Mathf.Deg2Rad) * px;
-        px = Math.Sin(cameraRotation.y * Mathf.Deg2Rad) * px;
+        px = Math.Sin(0/*cameraRotation.y * Mathf.Deg2Rad * .15*/) * px; //Rotation on the Y axis
 
         Vector3 targetPosition = transform.position;
         if (this is OnlineMapsTileSetControl)
