@@ -55,6 +55,15 @@ public class GlobalController : MonoBehaviour {
             menuStack.Push(animPlayer);
         }
 
+        if(animPlayer.gameObject.name == "MainScreen")
+        {
+            navBar.GetComponent<NavigationBar>().SetIconMenuButton();
+        }
+        else
+        {
+            navBar.GetComponent<NavigationBar>().SetIconBackArrow();
+        }
+
         if (initialMenu < 2)
         {
             if (animPlayer.gameObject.name == "MainScreen")
@@ -73,21 +82,14 @@ public class GlobalController : MonoBehaviour {
 
     public void BackMenu()
     {
-        /*
-        AnimationPlayer exitMenu = menuStack.Pop();
-        Debug.Log("popping: " + exitMenu.name);
-        // Debug.Log("exit menu: " + exitMenu);
-        AnimationPlayer nextMenu = menuStack.Peek();
-        Debug.Log("pushing: " + nextMenu.name);
-        // Debug.Log("next menu: " + nextMenu);
-        exitMenu.ExitAnimation(nextMenu);  */
         if (OnBackMenuClick != null)
             OnBackMenuClick();
 
         if (menuStack.Count > 1)
+        {
             if (menuStack.Peek().gameObject.name != "VenueList")
             {
-                if(menuStack.Peek().gameObject.name == "EventInformation")
+                if (menuStack.Peek().gameObject.name == "EventInformation")
                 {
                     menuStack.Pop().ExitAnimation();
                 }
@@ -102,6 +104,7 @@ public class GlobalController : MonoBehaviour {
             {
                 menuStack.Pop().ExitAnimationNoDisable();
             }
+        }
     }
 
     public void BackMenuNoEnter()
