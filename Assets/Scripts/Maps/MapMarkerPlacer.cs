@@ -66,8 +66,9 @@ namespace Maps
         float apiDelay = 0.25f;
         IEnumerator VenueLocationsQuery()
         {
-            yield return new WaitForEndOfFrame();
             control.ClearMarkers();
+
+            yield return new WaitForEndOfFrame();
 
             foreach (KeyValuePair<string,string> kvp in venueAddresses)
             {
@@ -94,6 +95,7 @@ namespace Maps
 
         void InitialVenueClick(OnlineMapsMarkerBase marker)
         {
+            Debug.Log("clicked");
             if (OnVenueClick != null)
                 OnVenueClick(((OnlineMapsMarker)marker));
         }
