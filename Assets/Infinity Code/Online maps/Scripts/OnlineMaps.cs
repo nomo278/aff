@@ -326,7 +326,7 @@ public class OnlineMaps : MonoBehaviour
     private OnlineMapsProviderEnum _provider;
     private bool _traffic;
     private int _type;
-    
+
     private Texture2D activeTexture;
     private Action<bool> checkConnectioCallback;
     private WWW checkConnectionWWW;
@@ -343,7 +343,7 @@ public class OnlineMaps : MonoBehaviour
 
     [NonSerialized]
     private double bottomRightLatitude;
-    
+
     [NonSerialized]
     private double bottomRightLongitude;
 
@@ -362,11 +362,7 @@ public class OnlineMaps : MonoBehaviour
     /// </summary>
     public static OnlineMaps instance
     {
-        get {
-            if (_instance == null)
-                _instance = FindObjectOfType<OnlineMaps>();
-            return _instance;
-        }
+        get { return _instance; }
     }
 
     /// <summary>
@@ -396,16 +392,16 @@ public class OnlineMaps : MonoBehaviour
     {
         get
         {
-            string[] types = {"Satellite", "Relief", "Terrain", "Map"};
+            string[] types = { "Satellite", "Relief", "Terrain", "Map" };
             if (provider == OnlineMapsProviderEnum.aMap) return new[] { types[0], types[2] };
-            if (provider == OnlineMapsProviderEnum.arcGis) return new[] {types[0], types[2]};
+            if (provider == OnlineMapsProviderEnum.arcGis) return new[] { types[0], types[2] };
             if (provider == OnlineMapsProviderEnum.custom) return null;
-            if (provider == OnlineMapsProviderEnum.google) return new[] {types[0], types[1], types[2]};
-            if (provider == OnlineMapsProviderEnum.mapQuest) return new[] {types[0], types[2]};
-            if (provider == OnlineMapsProviderEnum.nokia) return new[] {types[0], types[2], types[3]};
+            if (provider == OnlineMapsProviderEnum.google) return new[] { types[0], types[1], types[2] };
+            if (provider == OnlineMapsProviderEnum.mapQuest) return new[] { types[0], types[2] };
+            if (provider == OnlineMapsProviderEnum.nokia) return new[] { types[0], types[2], types[3] };
             if (provider == OnlineMapsProviderEnum.openStreetMap) return null;
             if (provider == OnlineMapsProviderEnum.sputnik) return null;
-            if (provider == OnlineMapsProviderEnum.virtualEarth) return new[] {types[0], types[2]};
+            if (provider == OnlineMapsProviderEnum.virtualEarth) return new[] { types[0], types[2] };
             return types;
         }
     }
@@ -644,7 +640,7 @@ public class OnlineMaps : MonoBehaviour
         needRedraw = allowRedraw = true;
     }
 
-// ReSharper disable once UnusedMember.Global
+    // ReSharper disable once UnusedMember.Global
     public void Awake()
     {
         _instance = this;
@@ -720,7 +716,7 @@ public class OnlineMaps : MonoBehaviour
             buffer.status = OnlineMapsBufferStatus.wait;
 
             GCCollect();
-            
+
             Redraw();
         }
         if (traffic != _traffic)
@@ -775,7 +771,7 @@ public class OnlineMaps : MonoBehaviour
                 }
             }
 
-            if (control is OnlineMapsControlBase3D) ((OnlineMapsControlBase3D) control).UpdateControl();
+            if (control is OnlineMapsControlBase3D) ((OnlineMapsControlBase3D)control).UpdateControl();
 
             if (OnMapUpdated != null) OnMapUpdated();
         }
@@ -922,8 +918,8 @@ public class OnlineMaps : MonoBehaviour
             int h = (target == OnlineMapsTarget.texture) ? texture.height : tilesetHeight;
             if (maxX <= w || maxY <= h) return CheckMapSize(z + 1);
         }
-        catch{}
-        
+        catch { }
+
         return z;
     }
 
@@ -1025,7 +1021,7 @@ public class OnlineMaps : MonoBehaviour
         catch
         {
         }
-        
+
     }
 
     /// <summary>
@@ -1100,7 +1096,7 @@ public class OnlineMaps : MonoBehaviour
         if (needGC || DateTime.Now.Ticks - lastGC > OnlineMapsUtils.second * 5) GCCollect();
     }
 
-// ReSharper disable once UnusedMember.Local
+    // ReSharper disable once UnusedMember.Local
     private void OnDestroy()
     {
         OnlineMapsThreadManager.Dispose();
@@ -1110,7 +1106,7 @@ public class OnlineMaps : MonoBehaviour
             _buffer.Dispose();
             _buffer = null;
         }
-        
+
         if (defaultColors != null && texture != null)
         {
             texture.SetPixels(defaultColors);
@@ -1135,8 +1131,8 @@ public class OnlineMaps : MonoBehaviour
         GCCollect();
     }
 
-// ReSharper disable once UnusedMember.Local
-    private void OnDisable ()
+    // ReSharper disable once UnusedMember.Local
+    private void OnDisable()
     {
         if (_instance == this) _instance = null;
 
@@ -1167,14 +1163,14 @@ public class OnlineMaps : MonoBehaviour
         UpdateBottonRightPosition();
     }
 
-// ReSharper disable once UnusedMember.Local
+    // ReSharper disable once UnusedMember.Local
     private void OnGUI()
     {
         if (string.IsNullOrEmpty(tooltip) && showMarkerTooltip != OnlineMapsShowMarkerTooltip.always) return;
 
         if (skin != null) GUI.skin = skin;
         GUIStyle style = new GUIStyle(GUI.skin.label);
-			
+
         if (OnPrepareTooltipStyle != null) OnPrepareTooltipStyle(ref style);
 
         if (!string.IsNullOrEmpty(tooltip))
@@ -1211,7 +1207,8 @@ public class OnlineMaps : MonoBehaviour
 
                     if (!(((mx > tlx && mx < brx) || (mx + 360 > tlx && mx + 360 < brx) ||
                        (mx - 360 > tlx && mx - 360 < brx)) &&
-                      marker.position.y < tly && marker.position.y > bry)) continue;
+                      marker.position.y < tly && marker.position.y > bry))
+                        continue;
 
                     if (marker.OnDrawTooltip != null) marker.OnDrawTooltip(marker);
                     else if (OnlineMapsMarkerBase.OnMarkerDrawTooltip != null) OnlineMapsMarkerBase.OnMarkerDrawTooltip(marker);
@@ -1237,7 +1234,8 @@ public class OnlineMaps : MonoBehaviour
 
                     if (!(((mx > tlx && mx < brx) || (mx + 360 > tlx && mx + 360 < brx) ||
                        (mx - 360 > tlx && mx - 360 < brx)) &&
-                      marker.position.y < tly && marker.position.y > bry)) continue;
+                      marker.position.y < tly && marker.position.y > bry))
+                        continue;
 
                     if (marker.OnDrawTooltip != null) marker.OnDrawTooltip(marker);
                     else if (OnlineMapsMarkerBase.OnMarkerDrawTooltip != null) OnlineMapsMarkerBase.OnMarkerDrawTooltip(marker);
@@ -1628,7 +1626,7 @@ public class OnlineMaps : MonoBehaviour
         }
     }
 
-// ReSharper disable once UnusedMember.Local
+    // ReSharper disable once UnusedMember.Local
     private void Start()
     {
         if (redrawOnPlay)
@@ -1724,11 +1722,11 @@ public class OnlineMaps : MonoBehaviour
             if (longitude < -180) longitude += 360;
             else if (longitude > 180) longitude -= 360;
         }
-        
+
         buffer.redrawType = redrawType;
         buffer.generateSmartBuffer = isUserControl;
         buffer.status = OnlineMapsBufferStatus.start;
-        
+
 #if !UNITY_WEBGL
         if (renderInThread)
         {
@@ -1747,11 +1745,11 @@ public class OnlineMaps : MonoBehaviour
         needRedraw = false;
     }
 
-// ReSharper disable once UnusedMember.Local
+    // ReSharper disable once UnusedMember.Local
     private void Update()
     {
         if (OnUpdateBefore != null) OnUpdateBefore();
-        
+
         CheckBaseProps();
         CheckGoogleAPIQuery();
         CheckDownloadComplete();
@@ -1788,5 +1786,5 @@ public class OnlineMaps : MonoBehaviour
         OnlineMapsUtils.TileToLatLong(px, py, _zoom, out topLeftLongitude, out topLeftLatitude);
     }
 
-#endregion
+    #endregion
 }
